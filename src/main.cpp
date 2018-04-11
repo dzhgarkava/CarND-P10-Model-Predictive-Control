@@ -101,6 +101,18 @@ int main() {
           double steer_value;
           double throttle_value;
 
+          Eigen::VectorXd waypoints_x = Eigen::VectorXd(ptsx.size());
+          Eigen::VectorXd waypoints_y = Eigen::VectorXd(ptsy.size());
+
+          for (uint i = 0; i < ptsx.size(); ++i)
+          {
+            // translation and then rotation
+            double dx = ptsx[i] - px;
+            double dy = ptsy[i] - py;
+            waypoints_x[i] = (dx * cos(-psi) - dy * sin(-psi));
+            waypoints_y[i] = (dx * sin(-psi) + dy * cos(-psi));
+          }
+
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
@@ -124,9 +136,14 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
+          for (uint i = 0; i < ptsx.size(); ++i)
+          {
+            next_x_vals.push_back(waypoints_x(i));
+            next_y_vals.push_back(waypoints_y(i));
+          }
+
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
-
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
