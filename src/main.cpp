@@ -113,6 +113,15 @@ int main() {
             waypoints_y[i] = (dx * sin(-psi) + dy * cos(-psi));
           }
 
+          Eigen::VectorXd coeffs = polyfit(waypoints_x, waypoints_x, 3);
+
+          // Cross Track Error
+          double cte = polyeval(coeffs, 0);
+
+          // PSI error
+          double psi_error = -atan(coeffs[1]);
+
+
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
