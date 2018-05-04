@@ -21,6 +21,8 @@ double dt = 0.1;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
+double ref_v = 50;
+
 // Order:
 // x1 - xN
 // y1 - yN
@@ -51,28 +53,29 @@ class FG_eval {
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
     // NOTE: You'll probably go back and forth between this function and
     // the Solver function below.
-    fg[0] = 0;
+      fg[0] = 0;
 
-    // The part of the cost based on the reference state.
-    for (int t = 0; t < N; t++)
-    {
-      fg[0] += CppAD::pow(vars[cte_index + t] , 2);
-      fg[0] += CppAD::pow(vars[epsi_index + t], 2);
-      fg[0] += CppAD::pow(vars[v_index + t], 2);
-    }
+      // The part of the cost based on the reference state.
+      for (int t = 0; t < N; t++)
+      {
+          fg[0] += 1000 * CppAD::pow(vars[cte_index + t], 2);
+          fg[0] += 3000 * CppAD::pow(vars[epsi_index + t], 2);
+          fg[0] += CppAD::pow(vars[v_index + t] - ref_v, 2);
+      }
 
-    // Minimize change-rate.
-    for (int t = 0; t < N - 1; t++)
-    {
-      fg[0] += CppAD::pow(vars[delta_index + t], 2);
-      fg[0] += CppAD::pow(vars[a_index + t], 2);
-    }
+      // Minimize the use of actuators.
+      for (int t = 0; t < N - 1; t++)
+      {
+          fg[0] += 10 * CppAD::pow(vars[delta_index + t], 2);
+          fg[0] += CppAD::pow(vars[a_index + t], 2);
+      }
 
-    // Minimize the value gap between sequential actuations.
-    for (int t = 0; t < N - 2; t++) {
-      fg[0] += CppAD::pow(vars[delta_index + t + 1] - vars[delta_index + t], 2);
-      fg[0] += CppAD::pow(vars[a_index + t + 1] - vars[a_index + t], 2);
-    }
+      // Minimize the value gap between sequential actuations.
+      for (int t = 0; t < N - 2; t++)
+      {
+          fg[0] += 400 * CppAD::pow(vars[delta_index + t + 1] - vars[delta_index + t], 2);
+          fg[0] += 100 * CppAD::pow(vars[a_index + t + 1] - vars[a_index + t], 2);
+      }
 
     fg[1 + x_index] = vars[x_index];
     fg[1 + y_index] = vars[y_index];
@@ -102,9 +105,8 @@ class FG_eval {
       AD<double> delta0 = vars[delta_index + t - 1];
       AD<double> a0 = vars[a_index + t - 1];
 
-      AD<double> f0 = coeffs[0] + coeffs[1] * x0;
-      AD<double> psides0 = CppAD::atan(coeffs[1]);
-
+      AD<double> f0 = coeffs[0] + coeffs[1] * x0 + coeffs[2] * CppAD::pow(x0, 2) + coeffs[3] * CppAD::pow(x0, 3);
+      AD<double> psides0 = CppAD::atan(coeffs[1] + 2 * coeffs[2] * x0 + 3 * coeffs[3] * CppAD::pow(x0, 2));
 
       // Here's `x` to get you started.
       // The idea here is to constraint this value to be 0.
@@ -122,6 +124,7 @@ class FG_eval {
       fg[1 + v_index + t] = v1 - (v0 + a0 * dt);
       fg[1 + cte_index + t] = cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
       fg[1 + epsi_index + t] = epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
+
     }
   }
 };
@@ -145,6 +148,13 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   size_t n_vars = 6 * N + 2 * (N -1 );
   // TODO: Set the number of constraints
   size_t n_constraints = 6 * N;
+
+  double x = state[0];
+  double y = state[1];
+  double psi = state[2];
+  double v = state[3];
+  double cte = state[4];
+  double epsi = state[5];
 
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
@@ -191,6 +201,20 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
+
+  constraints_lowerbound[x_index] = x;
+  constraints_lowerbound[y_index] = y;
+  constraints_lowerbound[psi_index] = psi;
+  constraints_lowerbound[v_index] = v;
+  constraints_lowerbound[cte_index] = cte;
+  constraints_lowerbound[epsi_index] = epsi;
+
+  constraints_upperbound[x_index] = x;
+  constraints_upperbound[y_index] = y;
+  constraints_upperbound[psi_index] = psi;
+  constraints_upperbound[v_index] = v;
+  constraints_upperbound[cte_index] = cte;
+  constraints_upperbound[epsi_index] = epsi;
 
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);
