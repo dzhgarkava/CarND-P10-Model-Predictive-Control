@@ -112,7 +112,7 @@ int main() {
             waypoints_y[i] = (dx * sin(-psi) + dy * cos(-psi));
           }
 
-          Eigen::VectorXd coeffs = polyfit(waypoints_x, waypoints_x, 3);
+          Eigen::VectorXd coeffs = polyfit(waypoints_x, waypoints_y, 3);
 
           // Cross Track Error
           double cte = polyeval(coeffs, 0);
@@ -122,7 +122,7 @@ int main() {
 
           Eigen::VectorXd state(6);
           state << 0, 0, 0, v, cte, psi_error;
-          auto vars = mpc.Solve(state, coeffs);
+          vector<double> vars = mpc.Solve(state, coeffs);
 
           // Set steering angle and throttle
           steer_value = -1.0 * vars[0];
@@ -140,6 +140,17 @@ int main() {
 
           // .. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
+          for (int i = 2; i < vars.size(); ++i)
+          {
+            if (i % 2 == 0)  // even: x
+            {
+               mpc_x_vals.push_back(vars[i]);
+            }
+            else  // odd: y
+            {
+               mpc_y_vals.push_back(vars[i]);
+            }
+          }
 
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
