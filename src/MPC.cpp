@@ -49,33 +49,33 @@ class FG_eval {
 
   typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
   void operator()(ADvector& fg, const ADvector& vars) {
-    // TODO: implement MPC
+    // Implementation of MPC
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
     // NOTE: You'll probably go back and forth between this function and
     // the Solver function below.
-      fg[0] = 0;
+    fg[0] = 0;
 
-      // The part of the cost based on the reference state.
-      for (int t = 0; t < N; t++)
-      {
-          fg[0] += 1000 * CppAD::pow(vars[cte_index + t], 2);
-          fg[0] += 3000 * CppAD::pow(vars[epsi_index + t], 2);
-          fg[0] += CppAD::pow(vars[v_index + t] - ref_v, 2);
-      }
+    // The part of the cost based on the reference state.
+    for (int t = 0; t < N; t++)
+    {
+      fg[0] += 1000 * CppAD::pow(vars[cte_index + t], 2);
+      fg[0] += 3000 * CppAD::pow(vars[epsi_index + t], 2);
+      fg[0] += CppAD::pow(vars[v_index + t] - ref_v, 2);
+    }
 
-      // Minimize the use of actuators.
-      for (int t = 0; t < N - 1; t++)
-      {
-          fg[0] += 10 * CppAD::pow(vars[delta_index + t], 2);
-          fg[0] += CppAD::pow(vars[a_index + t], 2);
-      }
+    // Minimize the use of actuators.
+    for (int t = 0; t < N - 1; t++)
+    {
+      fg[0] += 10 * CppAD::pow(vars[delta_index + t], 2);
+      fg[0] += CppAD::pow(vars[a_index + t], 2);
+    }
 
-      // Minimize the value gap between sequential actuations.
-      for (int t = 0; t < N - 2; t++)
-      {
-          fg[0] += 400 * CppAD::pow(vars[delta_index + t + 1] - vars[delta_index + t], 2);
-          fg[0] += 100 * CppAD::pow(vars[a_index + t + 1] - vars[a_index + t], 2);
-      }
+    // Minimize the value gap between sequential actuations.
+    for (int t = 0; t < N - 2; t++)
+    {
+      fg[0] += 400 * CppAD::pow(vars[delta_index + t + 1] - vars[delta_index + t], 2);
+      fg[0] += 100 * CppAD::pow(vars[a_index + t + 1] - vars[a_index + t], 2);
+    }
 
     fg[1 + x_index] = vars[x_index];
     fg[1 + y_index] = vars[y_index];
@@ -104,13 +104,13 @@ class FG_eval {
       // Only consider the actuation at time t.
       AD<double> delta0 = 0;
       AD<double> a0 = 0;
-      
+
       if (t == 1) // First step
       {
         a0 = vars[a_index + t - 1];
         delta0 = vars[delta_index + t - 1];
       }
-      else // Use previous actuation (to account for latency)
+      else // Use previous actuation to fix latency issue (dt is the same as 100ms)
       {
         a0 = vars[a_index + t - 2];
         delta0 = vars[delta_index + t - 2];
@@ -148,16 +148,16 @@ MPC::~MPC() {}
 
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
-  size_t i;
+
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
-  // TODO: Set the number of model variables (includes both states and inputs).
+  // Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
   // element vector and there are 10 timesteps. The number of variables is:
   //
   // 4 * 10 + 2 * 9
   size_t n_vars = 6 * N + 2 * (N -1 );
-  // TODO: Set the number of constraints
+  // Set the number of constraints
   size_t n_constraints = 6 * N;
 
   double x = state[0];
@@ -178,7 +178,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
 
-    // TODO: Set lower and upper limits for variables.
+  // Set lower and upper limits for variables.
 
   // Set all non-actuators upper and lowerlimits
   // to the max negative and positive values.
@@ -227,7 +227,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   constraints_upperbound[cte_index] = cte;
   constraints_upperbound[epsi_index] = epsi;
 
-  // object that computes objective and constraints
+  // Object that computes objective and constraints
   FG_eval fg_eval(coeffs);
 
   //
@@ -263,7 +263,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
 
-  // TODO: Return the first actuator values. The variables can be accessed with
+  // Return the first actuator values. The variables can be accessed with
   // `solution.x[i]`.
   //
   // {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
