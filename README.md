@@ -32,7 +32,7 @@ To fit waypoints I use third-order polynomial as it was mentioned in lectures.
 
 Also I transform coordinates of car from world's to local (main.cpp, lines: 117-123)
 
-## Timestep length, number of steps and latency 
+## Timestep length, duration and latency 
 
 The idea is: we need to maximize N * dt to increase horizont of predictions. But we can't choose very big value for N because calculation will take a lot of time and also we can't choose very big value for dt because in this case you will not apply actuators well-timed.
 
