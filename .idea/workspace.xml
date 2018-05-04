@@ -11,7 +11,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f2b3ae8-9703-44ed-aef9-12ca7dafb154" name="Default" comment="" />
+    <list default="true" id="0f2b3ae8-9703-44ed-aef9-12ca7dafb154" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/src/MPC.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MPC.cpp" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,7 +28,7 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1473">
+            <state relative-caret-position="959">
               <caret line="105" column="26" selection-start-line="105" selection-start-column="26" selection-end-line="105" selection-end-column="26" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
@@ -38,8 +40,8 @@
       <file leaf-file-name="MPC.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/MPC.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-818">
-              <caret line="38" column="28" lean-forward="true" selection-start-line="38" selection-start-column="28" selection-end-line="38" selection-end-column="28" />
+            <state relative-caret-position="36">
+              <caret line="23" column="17" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -158,12 +160,12 @@
       <workItem from="1525040474637" duration="552000" />
       <workItem from="1525126724706" duration="242000" />
       <workItem from="1525127211778" duration="8352000" />
-      <workItem from="1525462042312" duration="10463000" />
+      <workItem from="1525462042312" duration="11233000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40432000" />
+    <option name="totallyTimeSpent" value="41202000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -475,7 +477,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1473">
+        <state relative-caret-position="959">
           <caret line="105" column="26" selection-start-line="105" selection-start-column="26" selection-end-line="105" selection-end-column="26" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
@@ -485,8 +487,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/MPC.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-818">
-          <caret line="38" column="28" lean-forward="true" selection-start-line="38" selection-start-column="28" selection-end-line="38" selection-end-column="28" />
+        <state relative-caret-position="36">
+          <caret line="23" column="17" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
         </state>
       </provider>
     </entry>
